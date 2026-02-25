@@ -13,6 +13,18 @@ Contributions welcome! See [Contributing](#contributing) below.
 
 ## Install
 
+### Prerequisites
+
+If you don't have a skills folder yet, create one first:
+
+```bash
+# Global skills directory
+mkdir -p ~/.claude/skills
+
+# Or project-specific
+mkdir -p .claude/skills
+```
+
 ### All skills
 
 ```bash
@@ -41,6 +53,7 @@ git sparse-checkout set <skill-name>
 
 ```bash
 # Install just workflow-orchestration globally
+mkdir -p ~/.claude/skills
 git clone --depth 1 --filter=blob:none --sparse https://github.com/IwuchukwuDivine/skill-registry ~/.claude/skills/skill-registry
 cd ~/.claude/skills/skill-registry
 git sparse-checkout set workflow-orchestration

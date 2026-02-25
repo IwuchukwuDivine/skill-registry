@@ -1,78 +1,138 @@
 # skill-registry
 
-A community-driven registry of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills. Browse, pick, and install — each skill lives in its own folder, ready to drop into any project.
+A community-driven registry of [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skills.
+Browse, pick, and install — each skill lives in its own folder, ready to drop into Claude's `skills` directory.
 
 Contributions welcome! See [Contributing](#contributing) below.
+
+---
 
 ## Available Skills
 
 | Skill | Description |
-|-------|-------------|
+|---|---|
 | `nuxt-conventions` | Enforces Nuxt project conventions — directory structure, component patterns, composables, stores, styling, and TypeScript usage. |
-| `workflow-orchestration` | Disciplined task execution with planning, verification, and self-improvement loops. Includes subagent delegation, lessons tracking, and staff-engineer-level verification. |
+| `workflow-orchestration` | Disciplined task execution with planning, verification, and self-improvement loops. |
+
+---
+
+## How Claude Loads Skills
+
+Claude **only reads folders directly inside the `skills` directory**.
+
+✅ **Correct structure:**
+```
+.claude/
+└── skills/
+    ├── nuxt-conventions/
+    └── workflow-orchestration/
+```
+
+❌ **Incorrect structure** (won't be detected automatically):
+```
+.claude/
+└── skills/
+    └── skill-registry/
+        ├── nuxt-conventions/
+        └── workflow-orchestration/
+```
+
+Because of this, you should **clone the registry somewhere else**, then copy the skill folders into the skills directory.
+
+---
 
 ## Install
 
-### Prerequisites
+Skills can be installed **globally** (available to all projects) or **per project**.
 
-If you don't have a skills folder yet, create one first:
+| Type | Location |
+|---|---|
+| Global | `~/.claude/skills` |
+| Per project | `<project>/.claude/skills` |
 
+### Step 1 — Create the skills folder
+
+**macOS / Linux**
 ```bash
-# Global skills directory
 mkdir -p ~/.claude/skills
-
-# Or project-specific
-mkdir -p .claude/skills
 ```
 
-### All skills
-
-```bash
-git clone https://github.com/IwuchukwuDivine/skill-registry ~/.claude/skills/skill-registry
+**Windows (PowerShell)**
+```powershell
+New-Item -ItemType Directory -Force -Path "$HOME\.claude\skills" | Out-Null
 ```
 
-### A single skill
+---
 
-Copy just the folder you need:
+### Install All Skills
 
+**macOS / Linux**
 ```bash
-# Global (available to all projects)
-git clone --depth 1 --filter=blob:none --sparse https://github.com/IwuchukwuDivine/skill-registry ~/.claude/skills/skill-registry
-cd ~/.claude/skills/skill-registry
-git sparse-checkout set <skill-name>
+git clone https://github.com/IwuchukwuDivine/skill-registry ~/skill-registry
+cp -R ~/skill-registry/* ~/.claude/skills/
+rm -rf ~/skill-registry
 ```
 
-```bash
-# Project-specific
-git clone --depth 1 --filter=blob:none --sparse https://github.com/IwuchukwuDivine/skill-registry .claude/skills/skill-registry
-cd .claude/skills/skill-registry
-git sparse-checkout set <skill-name>
+**Windows (PowerShell)**
+```powershell
+git clone https://github.com/IwuchukwuDivine/skill-registry "$HOME\skill-registry"
+Copy-Item "$HOME\skill-registry\*" "$HOME\.claude\skills\" -Recurse -Force
+Remove-Item "$HOME\skill-registry" -Recurse -Force
 ```
 
-### Examples
+---
 
+### Install a Single Skill
+
+Uses Git sparse checkout to pull only one skill.
+
+**macOS / Linux**
 ```bash
-# Install just workflow-orchestration globally
-mkdir -p ~/.claude/skills
-git clone --depth 1 --filter=blob:none --sparse https://github.com/IwuchukwuDivine/skill-registry ~/.claude/skills/skill-registry
-cd ~/.claude/skills/skill-registry
+git clone --depth 1 --filter=blob:none --sparse https://github.com/IwuchukwuDivine/skill-registry ~/skill-registry
+cd ~/skill-registry
 git sparse-checkout set workflow-orchestration
+cp -R workflow-orchestration ~/.claude/skills/
+cd ~ && rm -rf ~/skill-registry
 ```
+
+**Windows (PowerShell)**
+```powershell
+git clone --depth 1 --filter=blob:none --sparse https://github.com/IwuchukwuDivine/skill-registry "$HOME\skill-registry"
+cd "$HOME\skill-registry"
+git sparse-checkout set workflow-orchestration
+Copy-Item "$HOME\skill-registry\workflow-orchestration" "$HOME\.claude\skills\" -Recurse -Force
+cd $HOME
+Remove-Item "$HOME\skill-registry" -Recurse -Force
+```
+
+---
+
+### Project-Specific Install
+
+To scope skills to a single project, copy them into the project directory instead:
+
+```
+my-project/.claude/skills/
+```
+
+Claude will load both global and project-level skills automatically.
+
+---
 
 ## Skill Structure
 
-Every skill follows this layout:
+Every skill must follow this layout:
 
 ```
 <skill-name>/
-├── SKILL.md       # Skill metadata and instructions (required)
+├── SKILL.md       # Required: metadata + instructions
 ├── references/    # Reference docs and examples
-└── docs/          # Additional documentation (optional)
+└── docs/          # Optional additional documentation
 ```
 
 ### SKILL.md format
 
-The `SKILL.md` file must start with a YAML frontmatter block:
+Each `SKILL.md` must begin with YAML frontmatter:
 
 ```yaml
 ---
@@ -80,38 +140,29 @@ name: your-skill-name
 description: >
   A clear description of what the skill does and when Claude should use it.
 ---
-
-# Instructions, rules, and patterns for Claude go here...
 ```
+
+The skill instructions go below the frontmatter.
+
+---
 
 ## Contributing
 
-We'd love your skills in the registry! Here's how to add one:
+### Steps
 
-1. **Fork** this repo
-2. **Create a folder** for your skill at the root (e.g. `my-awesome-skill/`)
-3. **Add a `SKILL.md`** with the frontmatter format shown above
-4. **Add a `references/` folder** with any supporting docs or examples
-5. **Open a PR** with:
-   - A short description of what the skill does
-   - Example use cases
-   - Any dependencies or requirements
+1. Fork the repo
+2. Create a folder at the repo root: `my-awesome-skill/`
+3. Add a `SKILL.md` and a `references/` folder
+4. Open a PR
 
 ### Guidelines
 
-- **One skill per folder** — keep skills self-contained
-- **Clear naming** — use lowercase kebab-case (`react-patterns`, not `ReactPatterns`)
-- **Good descriptions** — the `description` field in `SKILL.md` tells Claude when to activate the skill, so be specific
-- **No secrets or credentials** — don't include API keys, tokens, or sensitive data
-- **Test your skill** — make sure Claude picks it up and behaves as expected before submitting
+- One skill per folder
+- Use lowercase kebab-case names (e.g. `react-patterns`)
+- No secrets or credentials
+- Test your skill locally with Claude Code before submitting
 
-### PR checklist
-
-- [ ] Skill folder at repo root with kebab-case name
-- [ ] `SKILL.md` with valid YAML frontmatter (`name` + `description`)
-- [ ] `references/` folder with at least one reference file
-- [ ] No secrets, credentials, or sensitive data
-- [ ] Skill tested locally with Claude Code
+---
 
 ## License
 

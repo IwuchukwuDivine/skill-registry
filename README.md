@@ -11,6 +11,7 @@ Contributions welcome! See [Contributing](#contributing) below.
 
 | Skill | Description |
 |---|---|
+| `hermes-tweet` | Hermes Agent workflows for X/Twitter search, timeline reading, monitoring, follower exports, and approval-gated posting through Hermes Tweet. |
 | `nuxt-conventions` | Enforces Nuxt project conventions — directory structure, component patterns, composables, stores, styling, and TypeScript usage. |
 | `workflow-orchestration` | Disciplined task execution with planning, verification, and self-improvement loops. |
 
